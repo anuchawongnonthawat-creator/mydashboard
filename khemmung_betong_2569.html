@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข็มมุ่ง โรงพยาบาลเบตง 2569</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #0b1728;
+      --panel-2: #0f1d33;
+      --border: rgba(122, 158, 206, .22);
+      --line: rgba(200, 225, 255, .09);
+      --text: #eaf4ff;
+      --muted: #9fb6d4;
+      --cyan: #53d9ff;
+      --green: #0f9d58;
+      --green-soft: rgba(24, 184, 104, .18);
+      --red: #d93025;
+      --red-soft: rgba(240, 68, 56, .18);
+      --shadow: 0 18px 40px rgba(0, 0, 0, .28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(180deg, #06101d, #091424 35%, #08111d 100%);
+      color: var(--text);
+    }
+    .page {
+      max-width: 1680px;
+      margin: 0 auto;
+      padding: 24px 18px 56px;
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 22px;
+      border: 1px solid rgba(83, 217, 255, .25);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(15, 34, 61, .98), rgba(7, 19, 35, .98));
+      box-shadow: var(--shadow);
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 32px;
+      color: #7fe8ff;
+      font-weight: 800;
+    }
+    .sub { margin-top: 6px; font-size: 14px; color: #c8dcf4; }
+    .meta { margin-top: 8px; font-size: 12px; color: #8fb0d3; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, #28c6ff, #59deff); color: #042033; }
+    .btn-secondary { background: rgba(255, 255, 255, .06); color: #e4f3ff; border: 1px solid rgba(255, 255, 255, .12); }
+    .status-bar {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .04);
+      font-size: 13px;
+      color: #c8ddf7;
+      transition: all 0.3s ease;
+    }
+    .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .sum-box { padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); text-align: center; }
+    .sum-box .n { font-size: 38px; font-weight: 800; line-height: 1; }
+    .sum-box .l { margin-top: 6px; font-size: 13px; font-weight: 700; color: #e9f4ff; }
+    .s-total { background: linear-gradient(180deg, rgba(16, 28, 47, .92), rgba(9, 19, 34, .95)); }
+    .s-pass { background: linear-gradient(180deg, rgba(15, 157, 88, .25), rgba(8, 40, 24, .92)); border-color: rgba(24, 184, 104, .38); }
+    .s-develop { background: linear-gradient(180deg, rgba(217, 48, 37, .22), rgba(55, 13, 13, .92)); border-color: rgba(240, 68, 56, .38); }
+    .s-total .n { color: #79e5ff; }
+    .s-pass .n { color: #6dffb0; }
+    .s-develop .n { color: #ff8f89; }
+    .section { margin-top: 24px; }
+    .sec-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px 18px; border-radius: 16px; border: 1px solid rgba(83, 217, 255, .18); background: linear-gradient(180deg, rgba(13, 28, 49, .98), rgba(9, 20, 35, .98)); font-size: 20px; font-weight: 800; box-shadow: var(--shadow); }
+    .sec-tag { margin-left: auto; padding: 4px 10px; border-radius: 999px; font-size: 11px; color: #d2e9ff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); }
+    .sub-label { margin: 12px 2px 8px; font-size: 12px; font-weight: 800; letter-spacing: .08em; color: #74dbff; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
+    @media (min-width: 900px) {
+      .kpi-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .card { padding: 16px; border-radius: 18px; background: linear-gradient(180deg, rgba(14, 24, 42, .96), rgba(9, 18, 32, .98)); border: 1px solid rgba(255, 255, 255, .08); box-shadow: var(--shadow); }
+    .card.full-width { grid-column: 1 / -1; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .kpi-num { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #75ddff; }
+    .kpi-title { margin-top: 3px; font-size: 18px; font-weight: 700; line-height: 1.35; }
+    .target-pill { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(115, 101, 255, .14); border: 1px solid rgba(164, 149, 255, .38); color: #d7cdff; white-space: nowrap; }
+    .chart-wrap { height: 340px; margin-top: 14px; padding: 18px 12px 12px; border-radius: 16px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .06); }
+    .months-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 8px; margin-top: 14px; width: 100%; }
+    .month-box, .quarter-box { padding: 12px 10px; text-align: center; border-radius: 14px; background: linear-gradient(180deg, rgba(15, 28, 48, .95), rgba(10, 19, 35, .95)); border: 1px solid rgba(255, 255, 255, .08); min-width: 0; }
+    .month-box.red { border-color: rgba(240, 68, 56, .55); background: linear-gradient(180deg, rgba(240, 68, 56, .24), rgba(85, 17, 17, .92)); }
+    .month-box.neutral { border-color: rgba(255, 255, 255, .08); background: linear-gradient(180deg, rgba(15, 28, 48, .95), rgba(10, 19, 35, .95)); }
+    .month-box.red .label, .month-box.red .value { color: #ff8f89; }
+    .month-box .label, .quarter-box .label { font-size: 12px; color: #9db9d7; }
+    .month-box .value, .quarter-box .value { margin-top: 8px; font-size: 18px; font-weight: 800; color: #f3f9ff; word-break: break-word; }
+    .quarter-box.active { border-color: rgba(83, 217, 255, .28); box-shadow: 0 0 0 1px rgba(83, 217, 255, .08) inset; }
+    .status-panel { margin-top: 14px; padding: 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, .08); background: linear-gradient(180deg, rgba(14, 25, 42, .9), rgba(8, 18, 32, .95)); }
+    .status-panel.pass { border-color: rgba(24, 184, 104, .45); background: linear-gradient(180deg, rgba(24, 184, 104, .18), rgba(8, 40, 24, .92)); }
+    .status-panel.develop { border-color: rgba(240, 68, 56, .45); background: linear-gradient(180deg, rgba(240, 68, 56, .18), rgba(55, 13, 13, .92)); }
+    .status-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .status-caption { font-size: 12px; color: #9eb8d4; font-weight: 700; }
+    .status-big { margin-top: 10px; font-size: 28px; font-weight: 800; }
+    .status-eval, .status-detail { margin-top: 8px; font-size: 14px; color: #dcecff; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .badge.pass { background: var(--green-soft); color: #5cff9d; border: 1px solid rgba(24, 184, 104, .48); }
+    .badge.develop { background: var(--red-soft); color: #ff857f; border: 1px solid rgba(240, 68, 56, .48); }
+    .accum { margin-top: 14px; padding: 14px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, .08); background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .02)); }
+    .accum.pass { border-color: rgba(24, 184, 104, .38); background: linear-gradient(180deg, rgba(24, 184, 104, .14), rgba(24, 184, 104, .04)); }
+    .accum.develop { border-color: rgba(240, 68, 56, .38); background: linear-gradient(180deg, rgba(240, 68, 56, .14), rgba(240, 68, 56, .04)); }
+    .accum-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .accum-period { font-size: 12px; font-weight: 700; color: #a8c2de; }
+    .accum-val { margin-top: 10px; font-size: 26px; font-weight: 800; }
+    .accum-note { margin-top: 8px; font-size: 14px; color: #dcecff; }
+    .timeline { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .timeline-pill { padding: 5px 10px; border-radius: 999px; font-size: 12px; color: #d6eeff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .08); }
+    .note-toggle-btn { display: flex; align-items: center; gap: 7px; width: 100%; margin-top: 12px; padding: 9px 14px; border-radius: 12px; border: 1px solid rgba(255,210,80,.22); background: rgba(255,200,50,.05); color: #ffd95a; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: .18s; text-align: left; }
+    .note-toggle-btn:hover { background: rgba(255,200,50,.12); border-color: rgba(255,210,80,.45); }
+    .note-toggle-btn .arrow { margin-left: auto; transition: transform .22s; font-size: 11px; }
+    .note-toggle-btn.open .arrow { transform: rotate(180deg); }
+    .note-panel { display: none; margin-top: 8px; padding: 14px 16px; border-radius: 14px; background: rgba(255,200,50,.06); border: 1px solid rgba(255,210,80,.22); font-size: 14px; color: #f5e8b0; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+    .note-panel.open { display: block; }
+    .note-empty { color: #9aab88; font-style: italic; font-size: 13px; }
+    .view-panel[hidden] { display: none; }
+    .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; margin-top: 18px; }
+    .panel { padding: 16px; border-radius: 18px; background: linear-gradient(180deg, rgba(14, 24, 42, .96), rgba(9, 18, 32, .98)); border: 1px solid rgba(255, 255, 255, .08); box-shadow: var(--shadow); }
+    .panel-title { font-size: 18px; font-weight: 800; color: #dff0ff; margin: 0 0 12px; }
+    .kpi-list { display: flex; flex-direction: column; gap: 8px; max-height: 78vh; overflow: auto; }
+    .kpi-item { width: 100%; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, .08); background: rgba(255, 255, 255, .03); color: #eaf4ff; cursor: pointer; font-family: inherit; }
+    .kpi-item small { display: block; margin-top: 4px; color: #9db8d4; }
+    .kpi-item.active { border-color: rgba(83, 217, 255, .38); background: rgba(83, 217, 255, .10); }
+    .headline { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .headline h2 { margin: 0; font-size: 24px; font-weight: 700; color: #7fe8ff; }
+    .section-label { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); color: #d4e8ff; }
+    .status-chip { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .status-chip.pass { background: rgba(24, 184, 104, .18); color: #79f5b0; border: 1px solid rgba(24, 184, 104, .45); }
+    .status-chip.fail { background: rgba(240, 68, 56, .18); color: #ff9e9a; border: 1px solid rgba(240, 68, 56, .45); }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid.one { grid-template-columns: 1fr; }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #9fc0df; }
+    input, textarea, select { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .05); color: #eef7ff; font-family: inherit; font-size: 14px; }
+    input.accum-pass { border-color: rgba(24, 184, 104, .45); background: rgba(24, 184, 104, .18); }
+    input.accum-fail { border-color: rgba(240, 68, 56, .45); background: rgba(240, 68, 56, .18); }
+    textarea { min-height: 92px; resize: vertical; }
+    .hint { font-size: 11px; color: #84a9ca; margin-top: 2px; }
+    .data-table-wrap { margin-top: 14px; overflow: auto; border-radius: 14px; border: 1px solid rgba(255, 255, 255, .08); }
+    .data-table { width: 100%; border-collapse: collapse; min-width: 760px; background: rgba(255, 255, 255, .025); }
+    .data-table th, .data-table td { padding: 9px 10px; border-bottom: 1px solid rgba(255, 255, 255, .07); font-size: 13px; text-align: left; }
+    .data-table th { color: #9fc0df; background: rgba(255, 255, 255, .05); }
+    .data-table input { padding: 8px 9px; border-radius: 10px; }
+    .data-table .calc-cell { font-weight: 800; color: #dff5ff; }
+    .data-table tr.complaint-row .month-name, .data-table tr.complaint-row .calc-cell { color: #ff8f89; }
+    .form-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-top: 16px; }
+    .edit-preview { margin-top: 16px; padding-top: 16px; border-top: 1px dashed rgba(255,255,255,0.1); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    @media (max-width: 900px) {
+      .summary { grid-template-columns: 1fr; }
+      .card-top { flex-direction: column; }
+      .target-pill { align-self: flex-start; }
+      .layout { grid-template-columns: 1fr; }
+      .kpi-list { max-height: none; }
+    }
+    @media (max-width: 760px) { .form-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div>
+        <h1 id="pageTitle">เข็มมุ่ง โรงพยาบาลเบตง 2569</h1>
+        <div class="sub" id="pageSubtitle">โหลดข้อมูลจาก Firebase...</div>
+        <div class="meta" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span>ข้อมูล ณ เดือน:</span>
+          <select id="monthSelector" style="padding:5px 10px;border-radius:10px;border:1px solid rgba(83,217,255,.35);background:rgba(7,20,38,.95);color:#7fe8ff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">
+            <option value="">กำลังโหลด...</option>
+          </select>
+          <span id="updatedAt" style="color:#8fb0d3;font-size:11px;"></span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btnShowDashboard">หน้า Dashboard</button>
+        <button class="btn btn-secondary" id="btnShowEdit">หน้าแก้ไขข้อมูล</button>
+        <button class="btn btn-secondary" id="btnReload">รีโหลดข้อมูล</button>
+        <button class="btn btn-primary" id="btnSaveAll">บันทึกทั้งหมดขึ้นคลาวด์</button>
+      </div>
+    </div>
+
+    <div class="status-bar" id="syncStatus">กำลังเชื่อมต่อฐานข้อมูล...</div>
+
+    <div class="summary">
+      <div class="sum-box s-total">
+        <div class="n" id="sumTotal">0</div>
+        <div class="l">ตัวชี้วัดทั้งหมด</div>
+      </div>
+      <div class="sum-box s-pass">
+        <div class="n" id="sumPass">0</div>
+        <div class="l">ผ่าน</div>
+      </div>
+      <div class="sum-box s-develop">
+        <div class="n" id="sumDevelop">0</div>
+        <div class="l">พัฒนา</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Main View -->
+    <div id="dashboardView" class="view-panel">
+      <div id="dashboardRoot"></div>
+    </div>
+
+    <div id="editView" class="view-panel" hidden>
+      <div class="layout">
+        <aside class="panel">
+          <h3 class="panel-title">รายการตัวชี้วัด</h3>
+          <div class="kpi-list" id="kpiList"></div>
+        </aside>
+
+        <section class="panel">
+          <div class="headline">
+            <div>
+              <div class="section-label" id="currentSection">-</div>
+              <h2 id="formTitle">เลือกตัวชี้วัด</h2>
+            </div>
+            <span class="status-chip pass" id="statusChip">ผ่านเป้าหมาย</span>
+          </div>
+
+          <div class="form-grid">
+            <label>หัวข้อ KPI<input id="fTitle"></label>
+            <label>ข้อความเป้าหมาย<input id="fTargetLabel"></label>
+            <label>ประเภทผลลัพธ์
+              <select id="fStatus">
+                <option value="pass">ผ่าน</option>
+                <option value="fail">ต้องพัฒนา</option>
+              </select>
+            </label>
+            <label>รูปแบบการแสดงผล
+              <select id="fMode">
+                <option value="line">กราฟเส้น</option>
+                <option value="months">กล่องรายเดือน</option>
+                <option value="status">สถานะข้อความ</option>
+                <option value="quarters">รายไตรมาส</option>
+              </select>
+            </label>
+            <label>คำอธิบายช่วงสรุป<input id="fAccumLabel"></label>
+            <label>ค่าสรุปสะสม<input id="fAccumValue"></label>
+            <label>ข้อความประเมิน<input id="fEvalText"></label>
+            <label>รายละเอียดเพิ่มเติม<input id="fDetail"></label>
+            <label>สีกราฟ / ไฮไลต์ (HEX)<input id="fColor"></label>
+            <label>หน่วยข้อมูล<input id="fUnit"></label>
+            <label>ค่าเป้าหมายเชิงตัวเลข<input id="fTargetValue" type="number" step="0.01"></label>
+            <label>เปรียบเทียบเป้าหมาย
+              <select id="fCompare">
+                <option value="lte">ค่ายิ่งน้อยยิ่งดี (≤)</option>
+                <option value="gte">ค่ายิ่งมากยิ่งดี (≥)</option>
+                <option value="text">ประเมินจากสถานะข้อความ</option>
+              </select>
+            </label>
+            <label>ค่าแกน Y เริ่มต้น<input id="fYMin" type="number" step="0.01"></label>
+            <label>ชื่อผู้แก้ไข<input id="fEditorName"></label>
+          </div>
+
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>เดือน (ปีงบ 2569)</th>
+                  <th>ข้อมูลรายเดือน (พิมพ์เพื่ออัปเดต)</th>
+                  <th>ค่าที่ใช้แสดงผล</th>
+                </tr>
+              </thead>
+              <tbody id="monthlyRows"></tbody>
+            </table>
+          </div>
+
+          <div class="form-grid one" style="margin-top:12px">
+            <label>ค่ารายไตรมาส (คั่นด้วยเครื่องหมายจุลภาค `,` )
+              <textarea id="fQuarters"></textarea>
+              <div class="hint">ใช้สำหรับรูปแบบ KPI "รายไตรมาส" เท่านั้น เช่น: -22.31, -4.69, null, null</div>
+            </label>
+            <label>เหตุการณ์ / Timeline (คั่นแต่ละเหตุการณ์ด้วยเครื่องหมาย pipe `|` )
+              <textarea id="fTimeline"></textarea>
+            </label>
+            <label>วิเคราะห์ ปัญหา/ แนวทางพัฒนา
+              <textarea id="fNote"></textarea>
+            </label>
+          </div>
+
+          <div class="edit-preview">
+            <h3 class="panel-title" style="margin-bottom:12px; color:#53d9ff;">👀 ตัวอย่างผลการแสดงผลขณะแก้ไข (Live Preview)</h3>
+            <div id="editPreviewRoot"></div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-secondary" id="btnSaveOne">1. ยืนยันการแก้ไขตัวชี้วัดนี้</button>
+            <button class="btn btn-primary" id="btnSaveAllBottom">2. บันทึกข้อมูลทั้งหมดลงฐานข้อมูล</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Modal -->
+  <div id="customAlert" class="modal-overlay" style="display:none;">
+    <div class="panel max-w-sm w-full mx-4 text-center">
+      <h3 class="text-xl font-bold mb-4 text-[#7fe8ff]" id="alertTitle">ระบบ</h3>
+      <p class="text-sm mb-6 text-gray-300" id="alertText"></p>
+      <button class="btn btn-primary w-full" onclick="closeAlert()">ตกลง</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAz07C8pHkCGbRswlThu3NIwVoZmEkeELQ",
+      authDomain: "dashboardkpi-cg2026.firebaseapp.com",
+      databaseURL: "https://dashboardkpi-cg2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "dashboardkpi-cg2026",
+      storageBucket: "dashboardkpi-cg2026.firebasestorage.app",
+      messagingSenderId: "616161372378",
+      appId: "1:616161372378:web:d9ce6af87cc2e5e0889de3",
+      measurementId: "G-SJ2QKXPC12"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const MONTHS_12 = ['ต.ค.68','พ.ย.68','ธ.ค.68','ม.ค.69','ก.พ.69','มี.ค.69','เม.ย.69','พ.ค.69','มิ.ย.69','ก.ค.69','ส.ค.69','ก.ย.69'];
+    const QUARTERS = ['ไตรมาส 1','ไตรมาส 2','ไตรมาส 3','ไตรมาส 4'];
+    const COLORS = {
+      pass: '#18b868',
+      develop: '#f04438',
+      target: '#91b7ff',
+      grid: 'rgba(185,210,240,.10)',
+      tick: '#a7c2df',
+      labelBg: 'rgba(7,17,31,.9)',
+      labelBorder: 'rgba(221,237,255,.22)',
+      labelText: '#f2f8ff'
+    };
+
+    const DEFAULT_STATE = {
+      meta: {
+        title: 'เข็มมุ่ง โรงพยาบาลเบตง 2569',
+        subtitle: 'ตุลาคม 2568 – กันยายน 2569 | รายงานสะสม ต.ค. 68 – เม.ย. 69',
+        updatedLabel: 'เมษายน 2569',
+        updatedAt: '',
+        editorName: 'web-app'
+      },
+      sections: [
+        { id: 'service', title: '🏥 1. พัฒนาระบบบริการ', tag: 'ตัวชี้วัด 1–5', columns: 3, subgroup: '1.1 ลดอัตราการตาย' },
+        { id: 'complaint', title: '💬 2. ลดข้อร้องเรียน', tag: 'ตัวชี้วัด 6', columns: 1 },
+        { id: 'it', title: '💻 3. พัฒนาระบบสารสนเทศ', tag: 'ตัวชี้วัด 7–8', columns: 2 },
+        { id: 'finance', title: '💰 4. พัฒนาระบบการเงิน การคลัง', tag: 'ตัวชี้วัด 9–11', columns: 3 }
+      ],
+      kpis: [
+        { id: 1, sectionId: 'service', mode: 'line', title: 'อัตราตายทารกแรกเกิด 0–28 วัน', targetLabel: 'เป้า ≤ 4 ต่อพัน', targetValue: 4, compare: 'lte', unit: '', color: '#97C459', yMin: 0, series: [0,0,6.37,4.76,4.02,6.83,8.90,null,null,null,null,null], accumLabel: 'สะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '8.90 ต่อพันเกิดมีชีพ', evalText: 'เกินเป้า ≤ 4 ✗', detail: 'ทารกแรกเกิดมีชีพ 337 ราย | เสียชีวิต 3 ราย', timeline: ['ธ.ค. 68 : 1 ราย','มี.ค. 69 : 1 ราย','เม.ย. 69 : 1 ราย'], status: 'fail', note: '' },
+        { id: 2, sectionId: 'service', mode: 'line', title: 'อัตราตาย STEMI', targetLabel: 'เป้า < 9%', targetValue: 9, compare: 'lte', unit: '%', color: '#E24B4A', yMin: 0, series: [0,25,33.33,44.44,28.57,23.81,23.81,null,null,null,null,null], accumLabel: 'สะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '23.81%', evalText: 'เกินเป้า 9% ✗', detail: 'ผู้ป่วย STEMI ทั้งหมด 21 ราย | เสียชีวิต 5 ราย', timeline: ['พ.ย. : 1','ธ.ค. : 1','ม.ค. : 2','ก.พ. : 1'], status: 'fail', note: '' },
+        { id: 3, sectionId: 'service', mode: 'line', title: 'อัตราตายจาก Sepsis (ผู้ใหญ่)', targetLabel: 'เป้า ≤ 12%', targetValue: 12, compare: 'lte', unit: '%', color: '#EF9F27', yMin: 0, series: [20,13.51,12.31,10.53,10.34,8.74,9.32,null,null,null,null,null], accumLabel: 'สะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '9.32%', evalText: 'ต่ำกว่าเป้า 12% ✓', detail: 'ผู้ป่วย Sepsis ทั้งหมด 118 ราย | เสียชีวิต 11 ราย', timeline: ['ต.ค. : 2','พ.ย. : 1','ธ.ค. : 2','ม.ค. : 2','ก.พ. : 1','มี.ค. : 1','เม.ย. : 2'], status: 'pass', note: '' },
+        { id: 4, sectionId: 'service', mode: 'line', title: 'อัตราคลอดก่อนกำหนด 28–34 สัปดาห์', targetLabel: 'เป้า < 8%', targetValue: 8, compare: 'lte', unit: '%', color: '#1D9E75', yMin: 0, series: [0,0,0,0,0.4,0.69,1.19,null,null,null,null,null], accumLabel: 'สะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '1.19%', evalText: 'ต่ำกว่าเป้า 8% ✓', detail: 'ทารกคลอดทั้งหมด 335 ราย | คลอดก่อนกำหนด 4 ราย', timeline: ['ก.พ. 69 : 1 ราย','มี.ค. 69 : 1 ราย','เม.ย. 69 : 2 ราย'], status: 'pass', note: '' },
+        { id: 5, sectionId: 'service', mode: 'line', title: 'ร้อยละผู้ป่วย Fracture Around the Hip ได้รับการผ่าตัดภายใน 72 ชม.', targetLabel: 'เป้า ≥ 70%', targetValue: 70, compare: 'gte', unit: '%', color: '#378ADD', yMin: 0, series: [0,50,50,75,80,83.33,87.5,null,null,null,null,null], accumLabel: 'สะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '87.50%', evalText: 'เกินเป้า 70% ✓', detail: 'ผ่าตัดทั้งหมด 8 ราย | ผ่าตัดภายใน 72 ชม. สำเร็จ 7 ราย', timeline: ['ม.ค. 69 : 1 ราย เกินเวลา 72 ชม. ✗'], status: 'pass', note: '' },
+        { id: 6, sectionId: 'complaint', mode: 'months', title: 'จำนวนข้อร้องเรียนด้านพฤติกรรมบริการ', targetLabel: 'เป้า ≤ 5 เรื่อง/ปี', targetValue: 5, compare: 'lte', unit: 'เรื่อง', color: '#F5A623', yMin: 0, series: [1,1,0,1,0,0,0,null,null,null,null,null], accumLabel: 'สะสมรวม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '3 เรื่อง', evalText: 'ต่ำกว่าเป้า 5 เรื่อง ✓', detail: '', timeline: [], status: 'pass', note: '' },
+        { id: 7, sectionId: 'it', mode: 'status', title: 'SMART Hospital', targetLabel: 'เป้า ระดับทอง', targetValue: null, compare: 'text', unit: '', color: '#B07BFF', yMin: 0, series: [null,null,null,null,null,null,null,null,null,null,null,null], accumLabel: 'สถานะปัจจุบัน 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: 'ระดับเงิน (รอตรวจประเมินใหม่)', evalText: 'เป้าหมาย: ทอง ✗', detail: '', timeline: [], status: 'fail', note: '' },
+        { id: 8, sectionId: 'it', mode: 'status', title: 'HAIT (ประเมินจากสมาคมเวชสารสนเทศไทย)', targetLabel: 'เป้า ระดับ 1', targetValue: null, compare: 'text', unit: '', color: '#4ED7C4', yMin: 0, series: [null,null,null,null,null,null,null,null,null,null,null,null], accumLabel: 'สถานะปัจจุบัน 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: 'เตรียมรับการตรวจประเมิน', evalText: 'เป้าหมาย: ระดับ 1 ✗', detail: '', timeline: [], status: 'fail', note: '' },
+        { id: 9, sectionId: 'finance', mode: 'line', title: 'Sum Adj.RW ต่อเดือน', targetLabel: 'เป้า ≥ 850/เดือน', targetValue: 850, compare: 'gte', unit: '', color: '#7F77DD', yMin: 600, series: [1109.91,994.87,939.65,901.44,870.59,864.97,860.33,null,null,null,null,null], accumLabel: 'ค่าเฉลี่ยสะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '860.33', evalText: 'เกินเป้า 850 ✓', detail: '', timeline: [], status: 'pass', note: '' },
+        { id: 10, sectionId: 'finance', mode: 'line', title: 'ร้อยละ Audit เวชระเบียนผู้ป่วยใน', targetLabel: 'เป้า ≥ 80%', targetValue: 80, compare: 'gte', unit: '%', color: '#E24B4A', yMin: 0, series: [6.07,7.71,6,13.51,12.94,12.59,12.66,null,null,null,null,null], accumLabel: 'ค่าเฉลี่ยสะสม 7 เดือน (ต.ค.68–เม.ย.69)', accumValue: '12.66%', evalText: 'ต่ำกว่าเป้า 80% ✗', detail: '', timeline: [], status: 'fail', note: '' },
+        { id: 11, sectionId: 'finance', mode: 'quarters', title: 'ร้อยละค่าใช้จ่าย Lab ลดลงเทียบกับปีที่ผ่านมา (รายไตรมาส)', targetLabel: 'เป้า ลดลง >10%', targetValue: -10, compare: 'lte', unit: '%', color: '#00E0C6', yMin: 0, series: [null,null,null,null,null,null,null,null,null,null,null,null], quarterValues: [-22.31,-4.69,null,null], accumLabel: 'สะสมรวม (2 ไตรมาส)', accumValue: '-14.08%', evalText: 'ลดลงเกินเป้า >10% ✓', detail: '', timeline: [], status: 'pass', note: '' }
+      ]
+    };
+
+    const chartMap = {};
+    let currentState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    let selectedKpiId = null;
+    let activeView = 'dashboard';
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'dashboardkpi-cg2026';
+
+    function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+    function escapeHtml(text){
+      return String(text ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
+    function statusClass(status){ return status === 'pass' ? 'pass' : 'develop'; }
+    function statusLabel(status){ return status === 'pass' ? 'ผ่าน' : 'พัฒนา'; }
+    function valueText(v, unit){ return v === null || v === undefined || v === '' ? '-' : `${v}${unit || ''}`; }
+    function getKpiById(id){ return currentState.kpis.find(k => String(k.id) === String(id)); }
+    
+    function padSeriesToFiscalYear(values){
+      const series = (values || []).slice(0, 12);
+      while (series.length < 12) series.push(null);
+      return series;
+    }
+
+    function normalizeState(state){
+      if(!state) return deepClone(DEFAULT_STATE);
+      if(!state.meta) state.meta = deepClone(DEFAULT_STATE.meta);
+      if(!state.sections) state.sections = deepClone(DEFAULT_STATE.sections);
+      if(!state.kpis) state.kpis = deepClone(DEFAULT_STATE.kpis);
+
+      state.kpis.forEach(kpi => {
+        kpi.series = padSeriesToFiscalYear(kpi.series || []);
+        if(!kpi.timeline) kpi.timeline = [];
+      });
+      return state;
+    }
+
+    function parseInputNumber(value){
+      const text = String(value ?? '').trim();
+      if (!text || text === '-' || text.toLowerCase() === 'null') return null;
+      const n = Number(text.replace(/,/g, ''));
+      return Number.isNaN(n) ? null : n;
+    }
+
+    function formatNumber(value){
+      if (value === null || value === undefined || value === '') return '';
+      return Number(value).toLocaleString('th-TH', { maximumFractionDigits: 2 });
+    }
+
+    function getEnteredSeries(){
+      return MONTHS_12.map((_, idx) => parseInputNumber(document.querySelector(`[data-month-index="${idx}"]`)?.value));
+    }
+
+    function lastEnteredIndex(series){
+      for (let i = series.length - 1; i >= 0; i--) {
+        if (series[i] !== null && series[i] !== undefined) return i;
+      }
+      return -1;
+    }
+
+    function getSectionTitle(sectionId){
+      const found = currentState.sections.find(s => s.id === sectionId);
+      return found ? found.title : '-';
+    }
+
+    function toNumberArray(text){
+      return String(text || '').split(',').map(v => v.trim()).filter(v => v !== '').map(v => {
+        if (v.toLowerCase() === 'null' || v === '-') return null;
+        const n = Number(v);
+        return Number.isNaN(n) ? null : n;
+      });
+    }
+
+    function toTextArray(text){
+      return String(text || '').split('|').map(v => v.trim()).filter(Boolean);
+    }
+
+    function buildAccumLabel(kpi, count, lastIdx){
+      if (count === 0) return 'ยังไม่มีข้อมูล';
+      const monthRange = `ต.ค.68-${MONTHS_12[lastIdx]}`;
+      if (kpi.mode === 'months') return `สะสมรวม ${count} เดือน (${monthRange})`;
+      return `สะสม ${count} เดือน (${monthRange})`;
+    }
+
+    function calculateKpiFromSeries(kpi){
+      const series = padSeriesToFiscalYear(kpi.series || []);
+      const entered = series.filter(v => v !== null && v !== undefined);
+      const lastIdx = lastEnteredIndex(series);
+      
+      let calcValue = null;
+      if (kpi.mode === 'months') {
+        calcValue = entered.reduce((sum, value) => sum + Number(value), 0);
+      } else {
+        calcValue = lastIdx >= 0 ? Number(series[lastIdx]) : null;
+      }
+
+      const ok = meetsTarget(calcValue, kpi);
+      kpi.status = ok === null ? (kpi.status || 'pass') : ok ? 'pass' : 'fail';
+      kpi.accumLabel = buildAccumLabel(kpi, entered.length, lastIdx);
+      kpi.accumValue = calcValue === null ? '' : `${formatNumber(calcValue)}${kpi.unit || ''}`;
+      
+      if (ok !== null) {
+        const direction = kpi.compare === 'gte' ? 'มากกว่าหรือเท่ากับ' : 'น้อยกว่าหรือเท่ากับ';
+        kpi.evalText = `${ok ? 'ผ่าน' : 'ต้องพัฒนา'}: เป้าหมายคือ ${direction} ${kpi.targetValue}${kpi.unit || ''}`;
+      }
+    }
+
+    function meetsTarget(value, kpi){
+      if (value === null || value === undefined || value === '' || kpi.compare === 'text') return null;
+      if (kpi.compare === 'gte') return Number(value) >= Number(kpi.targetValue);
+      if (kpi.compare === 'lte') return Number(value) <= Number(kpi.targetValue);
+      return null;
+    }
+
+    function setSyncStatus(text, type='info'){
+      const el = document.getElementById('syncStatus');
+      el.textContent = text;
+      el.style.borderColor = type === 'success'
+        ? 'rgba(24,184,104,.38)'
+        : type === 'error'
+          ? 'rgba(240,68,56,.38)'
+          : 'rgba(122,158,206,.22)';
+      el.style.background = type === 'success'
+        ? 'rgba(24,184,104,.08)'
+        : type === 'error'
+          ? 'rgba(240,68,56,.08)'
+          : 'rgba(255,255,255,.04)';
+    }
+
+    window.toggleNote = function(panelId, btnId) {
+      const panel = document.getElementById(panelId);
+      const btn = document.getElementById(btnId);
+      if (!panel || !btn) return;
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+    };
+
+    window.customAlert = function(title, msg) {
+      document.getElementById('alertTitle').textContent = title;
+      document.getElementById('alertText').textContent = msg;
+      document.getElementById('customAlert').style.display = 'flex';
+    };
+
+    window.closeAlert = function() {
+      document.getElementById('customAlert').style.display = 'none';
+    };
+
+    // Returns sorted array of month indices (0-11) that have data across all KPIs
+    function getAvailableMonthIndices(){
+      const indices = new Set();
+      currentState.kpis.forEach(kpi => {
+        (kpi.series || []).forEach((v, idx) => {
+          if (v !== null && v !== undefined && v !== '') indices.add(idx);
+        });
+      });
+      return [...indices].sort((a,b) => a-b);
+    }
+
+    // Returns a deep-cloned state with KPI data truncated to upToIdx
+    function getStateForMonth(upToIdx){
+      const clone = deepClone(currentState);
+      clone.kpis.forEach(kpi => {
+        kpi.series = kpi.series.map((v, i) => i <= upToIdx ? v : null);
+        if (kpi.mode === 'line' || kpi.mode === 'months') {
+          calculateKpiFromSeries(kpi);
+        }
+      });
+      return clone;
+    }
+
+    let selectedMonthIdx = null;
+
+    function updateHeader(){
+      document.getElementById('pageTitle').textContent = currentState.meta.title || '-';
+      document.getElementById('pageSubtitle').textContent = currentState.meta.subtitle || '-';
+      const updatedAt = currentState.meta.updatedAt || '';
+      document.getElementById('updatedAt').textContent = updatedAt ? `(บันทึกล่าสุด: ${updatedAt})` : '';
+
+      // Populate month selector
+      const availableIdx = getAvailableMonthIndices();
+      const sel = document.getElementById('monthSelector');
+      const prevVal = sel.value;
+      sel.innerHTML = '';
+      if (availableIdx.length === 0) {
+        sel.innerHTML = '<option value="">ยังไม่มีข้อมูล</option>';
+        selectedMonthIdx = null;
+        return;
+      }
+      [...availableIdx].reverse().forEach((idx, i) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = MONTHS_12[idx] + (i === 0 ? ' (ล่าสุด)' : '');
+        sel.appendChild(opt);
+      });
+      if (prevVal !== '' && availableIdx.includes(Number(prevVal))) {
+        sel.value = prevVal;
+      } else {
+        sel.value = availableIdx[availableIdx.length - 1];
+      }
+      selectedMonthIdx = Number(sel.value);
+    }
+
+    function renderDashboard(){
+      updateHeader();
+
+      // Use month-filtered state for rendering
+      const viewState = (selectedMonthIdx !== null) ? getStateForMonth(selectedMonthIdx) : currentState;
+
+      // Update summary from filtered state
+      const total = viewState.kpis.length;
+      const pass = viewState.kpis.filter(x => x.status === 'pass').length;
+      document.getElementById('sumTotal').textContent = total;
+      document.getElementById('sumPass').textContent = pass;
+      document.getElementById('sumDevelop').textContent = total - pass;
+
+      const root = document.getElementById('dashboardRoot');
+      root.innerHTML = '';
+
+      viewState.sections.forEach(section => {
+        const sec = document.createElement('section');
+        sec.className = 'section';
+        sec.innerHTML = `<div class="sec-head">${escapeHtml(section.title)}<span class="sec-tag">${escapeHtml(section.tag || '')}</span></div>`;
+
+        if (section.subgroup) {
+          const sub = document.createElement('div');
+          sub.className = 'sub-label';
+          sub.textContent = section.subgroup;
+          sec.appendChild(sub);
+        }
+
+        const grid = document.createElement('div');
+        grid.className = `kpi-grid cols-${section.columns || 3}`;
+
+        viewState.kpis
+          .filter(k => k.sectionId === section.id)
+          .forEach(kpi => grid.appendChild(renderKpiCard(kpi)));
+
+        sec.appendChild(grid);
+        root.appendChild(sec);
+      });
+
+      drawCharts('chart', viewState.kpis);
+    }
+
+    function buildComplaintMonthBox(val, unit){
+      const hasComplaint = val !== null && val !== undefined && Number(val) > 0;
+      const cls = hasComplaint ? 'red' : 'neutral';
+      return { cls, text: valueText(val, unit) };
+    }
+
+    function renderKpiCard(kpi, chartPrefix='chart'){
+      const card = document.createElement('div');
+      card.className = `card ${kpi.id === 6 ? 'full-width' : ''}`;
+      const badgeClass = statusClass(kpi.status);
+
+      let bodyHtml = '';
+
+      if (kpi.mode === 'line') {
+        bodyHtml = `<div class="chart-wrap"><canvas id="${chartPrefix}-${kpi.id}"></canvas></div>`;
+      } else if (kpi.mode === 'months') {
+        bodyHtml = `<div class="months-grid">${MONTHS_12.map((m, idx) => {
+          const info = buildComplaintMonthBox(kpi.series[idx], kpi.unit);
+          return `<div class="month-box ${info.cls}"><div class="label">${m}</div><div class="value">${info.text}</div></div>`;
+        }).join('')}</div>`;
+      } else if (kpi.mode === 'status') {
+        bodyHtml = `
+          <div class="status-panel ${badgeClass}">
+            <div class="status-top">
+              <div class="status-caption">${escapeHtml(kpi.accumLabel)}</div>
+              <span class="badge ${badgeClass}">${statusLabel(kpi.status)}</span>
+            </div>
+            <div class="status-big">${escapeHtml(kpi.accumValue)}</div>
+            <div class="status-eval">${escapeHtml(kpi.evalText)}</div>
+            ${kpi.detail ? `<div class="status-detail">${escapeHtml(kpi.detail)}</div>` : ''}
+            ${kpi.timeline && kpi.timeline.length ? `<div class="timeline">${kpi.timeline.map(item => `<span class="timeline-pill">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
+          </div>`;
+      } else if (kpi.mode === 'quarters') {
+        bodyHtml = `<div class="months-grid">${QUARTERS.map((q, idx) => `
+          <div class="quarter-box ${kpi.quarterValues && kpi.quarterValues[idx] !== null && kpi.quarterValues[idx] !== undefined ? 'active' : ''}">
+            <div class="label">${q}</div>
+            <div class="value">${kpi.quarterValues && kpi.quarterValues[idx] !== null && kpi.quarterValues[idx] !== undefined ? `${kpi.quarterValues[idx]}%` : '-'}</div>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      const noteId = `note-panel-${chartPrefix}-${kpi.id}`;
+      const noteBtnId = `note-btn-${chartPrefix}-${kpi.id}`;
+      const hasNote = kpi.note && kpi.note.trim();
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="kpi-num">ตัวชี้วัด ${kpi.id}</div>
+            <div class="kpi-title">${escapeHtml(kpi.title)}</div>
+          </div>
+          <div class="target-pill">${escapeHtml(kpi.targetLabel)}</div>
+        </div>
+        ${bodyHtml}
+        ${(kpi.mode === 'line' || kpi.mode === 'months' || kpi.mode === 'quarters') ? `
+          <div class="accum ${badgeClass}">
+            <div class="accum-top">
+              <div class="accum-period">${escapeHtml(kpi.accumLabel)}</div>
+              <span class="badge ${badgeClass}">${statusLabel(kpi.status)}</span>
+            </div>
+            <div class="accum-val">${escapeHtml(kpi.accumValue)}</div>
+            <div class="accum-note">${escapeHtml(kpi.evalText)}</div>
+            ${kpi.detail ? `<div class="accum-note">${escapeHtml(kpi.detail)}</div>` : ''}
+            ${kpi.timeline && kpi.timeline.length ? `<div class="timeline">${kpi.timeline.map(item => `<span class="timeline-pill">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
+          </div>` : ''}
+        <button class="note-toggle-btn${hasNote ? '' : ''}" id="${noteBtnId}" onclick="toggleNote('${noteId}','${noteBtnId}')">
+          📝 วิเคราะห์ / แนวทางพัฒนา ${hasNote ? '<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(255,200,50,.18);color:#ffd95a;margin-left:4px;">มีข้อมูล</span>' : '<span style="font-size:11px;color:#8a9e7a;font-weight:400;margin-left:4px;">(ยังไม่ได้บันทึก)</span>'}
+          <span class="arrow">▼</span>
+        </button>
+        <div class="note-panel" id="${noteId}">${hasNote ? escapeHtml(kpi.note) : '<span class="note-empty">ยังไม่มีข้อความวิเคราะห์ — กรุณาเพิ่มในหน้าแก้ไขข้อมูล</span>'}</div>`;
+      return card;
+    }
+
+    function drawCharts(chartPrefix='chart', kpiList=null){
+      const kpis = kpiList || currentState.kpis;
+      kpis.forEach(kpi => {
+        if (kpi.mode !== 'line') return;
+
+        const canvas = document.getElementById(`${chartPrefix}-${kpi.id}`);
+        if (!canvas) return;
+        const chartKey = `${chartPrefix}-${kpi.id}`;
+        if (chartMap[chartKey]) chartMap[chartKey].destroy();
+
+        const data = MONTHS_12.map((_, idx) => kpi.series && kpi.series[idx] !== undefined ? kpi.series[idx] : null);
+        const labels = MONTHS_12;
+        const targetSeries = typeof kpi.targetValue === 'number'
+          ? labels.map((_, idx) => data[idx] !== null && data[idx] !== undefined ? kpi.targetValue : null)
+          : [];
+        const sourceColor = kpi.color || '#4da3ff';
+
+        chartMap[chartKey] = new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'ค่าจริง',
+                data,
+                borderColor: sourceColor,
+                backgroundColor: sourceColor + '26',
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: .35,
+                spanGaps: false,
+                pointBackgroundColor: data.map(v => {
+                  const ok = meetsTarget(v, kpi);
+                  return ok === null ? sourceColor : ok ? COLORS.pass : COLORS.develop;
+                }),
+                pointBorderColor: data.map(v => {
+                  const ok = meetsTarget(v, kpi);
+                  return ok === null ? sourceColor : ok ? COLORS.pass : COLORS.develop;
+                }),
+                pointBorderWidth: 2
+              },
+              ...(typeof kpi.targetValue === 'number' ? [{
+                label: 'เป้าหมาย',
+                data: targetSeries,
+                borderColor: COLORS.target,
+                borderDash: [7,6],
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                borderWidth: 2,
+                fill: false,
+                datalabels: { display: false }
+              }] : [])
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 42, right: 10, left: 6, bottom: 0 } },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(7,17,31,.96)',
+                borderColor: 'rgba(255,255,255,.12)',
+                borderWidth: 1,
+                displayColors: false,
+                callbacks: {
+                  label(ctx){
+                    const val = ctx.parsed.y;
+                    return `${ctx.dataset.label}: ${valueText(val, kpi.unit)}`;
+                  }
+                }
+              },
+              datalabels: {
+                formatter(value){ return value === null || value === undefined ? '' : `${value}${kpi.unit || ''}`; },
+                display(ctx){ return ctx.dataset.label === 'ค่าจริง' && ctx.dataset.data[ctx.dataIndex] !== null && ctx.dataset.data[ctx.dataIndex] !== undefined; },
+                align: 'top',
+                anchor: 'end',
+                offset: 8,
+                clip: false,
+                color: COLORS.labelText,
+                backgroundColor(ctx){
+                  const val = ctx.dataset.data[ctx.dataIndex];
+                  const ok = meetsTarget(val, kpi);
+                  return ok === null ? COLORS.labelBg : ok ? 'rgba(15,157,88,.92)' : 'rgba(217,48,37,.92)';
+                },
+                borderColor: COLORS.labelBorder,
+                borderWidth: 1,
+                borderRadius: 8,
+                padding: { top: 4, right: 6, bottom: 4, left: 6 },
+                font: { weight: '700', size: 11 }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: COLORS.tick, maxRotation: 0, autoSkip: false, font: { weight: '700' } },
+                grid: { color: COLORS.grid, drawBorder: false }
+              },
+              y: {
+                beginAtZero: Number(kpi.yMin || 0) === 0,
+                min: Number.isFinite(Number(kpi.yMin)) ? Number(kpi.yMin) : undefined,
+                grace: '15%',
+                ticks: { color: COLORS.tick },
+                grid: { color: COLORS.grid, drawBorder: false }
+              }
+            }
+          },
+          plugins: [ChartDataLabels]
+        });
+      });
+    }
+
+    function setView(view){
+      activeView = view;
+      document.getElementById('dashboardView').hidden = view !== 'dashboard';
+      document.getElementById('editView').hidden = view !== 'edit';
+      
+      const dashboardBtn = document.getElementById('btnShowDashboard');
+      const editBtn = document.getElementById('btnShowEdit');
+
+      if (view === 'dashboard') {
+        dashboardBtn.className = "btn btn-primary";
+        editBtn.className = "btn btn-secondary";
+        renderDashboard();
+      } else {
+        dashboardBtn.className = "btn btn-secondary";
+        editBtn.className = "btn btn-primary";
+        if (!selectedKpiId) selectedKpiId = currentState.kpis[0]?.id;
+        renderKpiList();
+        selectKpi(selectedKpiId);
+      }
+    }
+
+    function renderKpiList(){
+      const list = document.getElementById('kpiList');
+      if (!list) return;
+      list.innerHTML = currentState.kpis.map(kpi => `
+        <button type="button" class="kpi-item ${String(kpi.id) === String(selectedKpiId) ? 'active' : ''}" data-id="${kpi.id}">
+          <strong>ตัวชี้วัด ${kpi.id}</strong>
+          <small>${escapeHtml(kpi.title)}</small>
+        </button>`).join('');
+      list.querySelectorAll('[data-id]').forEach(btn => btn.addEventListener('click', () => selectKpi(btn.dataset.id)));
+    }
+
+    function renderMonthlyRows(kpi){
+      const rows = document.getElementById('monthlyRows');
+      if (!rows) return;
+      const series = padSeriesToFiscalYear(kpi.series || []);
+      rows.innerHTML = MONTHS_12.map((month, idx) => {
+        const value = series[idx];
+        const hasComplaint = kpi.mode === 'months' && value !== null && value !== undefined && Number(value) > 0;
+        return `
+          <tr class="${hasComplaint ? 'complaint-row' : ''}">
+            <td class="month-name font-bold text-gray-300">${month}</td>
+            <td><input type="text" data-month-index="${idx}" class="w-full bg-[#132238] border border-gray-700 rounded-lg p-2 text-white" value="${value === null || value === undefined ? '' : value}"></td>
+            <td class="calc-cell font-bold">${valueText(value, kpi.unit)}</td>
+          </tr>`;
+      }).join('');
+      rows.querySelectorAll('[data-month-index]').forEach(input => input.addEventListener('input', () => applyEditorInputs(true)));
+    }
+
+    function updateMonthlyCalculatedCells(kpi){
+      document.querySelectorAll('#monthlyRows tr').forEach((row, idx) => {
+        const value = kpi.series[idx];
+        const hasComplaint = kpi.mode === 'months' && value !== null && value !== undefined && Number(value) > 0;
+        row.classList.toggle('complaint-row', hasComplaint);
+        const calc = row.querySelector('.calc-cell');
+        if (calc) calc.textContent = valueText(value, kpi.unit);
+      });
+    }
+
+    function updateStatusChip(status){
+      const chip = document.getElementById('statusChip');
+      const accumValue = document.getElementById('fAccumValue');
+      if (!chip || !accumValue) return;
+      chip.className = `status-chip ${status === 'pass' ? 'pass' : 'fail'}`;
+      chip.textContent = status === 'pass' ? 'ผ่านเป้าหมาย' : 'ต้องพัฒนา';
+      accumValue.classList.toggle('accum-pass', status === 'pass');
+      accumValue.classList.toggle('accum-fail', status !== 'pass');
+    }
+
+    function renderEditPreview(){
+      const root = document.getElementById('editPreviewRoot');
+      const kpi = getKpiById(selectedKpiId);
+      if (!root || !kpi) return;
+      root.innerHTML = '';
+      root.appendChild(renderKpiCard(kpi, 'editChart'));
+      drawCharts('editChart');
+    }
+
+    function selectKpi(id){
+      selectedKpiId = id;
+      const kpi = getKpiById(id);
+      if (!kpi) return;
+      renderKpiList();
+      document.getElementById('currentSection').textContent = getSectionTitle(kpi.sectionId);
+      document.getElementById('formTitle').textContent = `แก้ไขตัวชี้วัดที่ ${kpi.id}`;
+      document.getElementById('fTitle').value = kpi.title || '';
+      document.getElementById('fTargetLabel').value = kpi.targetLabel || '';
+      document.getElementById('fStatus').value = kpi.status || 'pass';
+      document.getElementById('fMode').value = kpi.mode || 'line';
+      document.getElementById('fAccumLabel').value = kpi.accumLabel || '';
+      document.getElementById('fAccumValue').value = kpi.accumValue || '';
+      document.getElementById('fEvalText').value = kpi.evalText || '';
+      document.getElementById('fDetail').value = kpi.detail || '';
+      document.getElementById('fColor').value = kpi.color || '';
+      document.getElementById('fUnit').value = kpi.unit || '';
+      document.getElementById('fTargetValue').value = kpi.targetValue ?? '';
+      document.getElementById('fCompare').value = kpi.compare || 'text';
+      document.getElementById('fYMin').value = kpi.yMin ?? '';
+      document.getElementById('fQuarters').value = (kpi.quarterValues || []).map(v => v === null ? 'null' : v).join(', ');
+      document.getElementById('fTimeline').value = (kpi.timeline || []).join(' | ');
+      document.getElementById('fNote').value = kpi.note || '';
+      document.getElementById('fEditorName').value = currentState.meta.editorName || 'web-app';
+      
+      renderMonthlyRows(kpi);
+      updateStatusChip(kpi.status);
+      renderEditPreview();
+    }
+
+    function applyEditorInputs(autoCalculate=false){
+      const kpi = getKpiById(selectedKpiId);
+      if (!kpi) return;
+      kpi.title = document.getElementById('fTitle').value.trim();
+      kpi.targetLabel = document.getElementById('fTargetLabel').value.trim();
+      kpi.status = document.getElementById('fStatus').value;
+      kpi.mode = document.getElementById('fMode').value;
+      kpi.accumLabel = document.getElementById('fAccumLabel').value.trim();
+      kpi.accumValue = document.getElementById('fAccumValue').value.trim();
+      kpi.evalText = document.getElementById('fEvalText').value.trim();
+      kpi.detail = document.getElementById('fDetail').value.trim();
+      kpi.color = document.getElementById('fColor').value.trim() || '#57c7ff';
+      kpi.unit = document.getElementById('fUnit').value.trim();
+      const targetValue = document.getElementById('fTargetValue').value;
+      kpi.targetValue = targetValue === '' ? null : Number(targetValue);
+      kpi.compare = document.getElementById('fCompare').value;
+      const yMin = document.getElementById('fYMin').value;
+      kpi.yMin = yMin === '' ? 0 : Number(yMin);
+      kpi.series = padSeriesToFiscalYear(getEnteredSeries());
+      kpi.quarterValues = toNumberArray(document.getElementById('fQuarters').value);
+      kpi.timeline = toTextArray(document.getElementById('fTimeline').value);
+      kpi.note = document.getElementById('fNote').value.trim();
+      currentState.meta.editorName = document.getElementById('fEditorName').value.trim() || 'web-app';
+      
+      if (autoCalculate && (kpi.mode === 'line' || kpi.mode === 'months')) {
+        calculateKpiFromSeries(kpi);
+        document.getElementById('fStatus').value = kpi.status;
+        document.getElementById('fAccumLabel').value = kpi.accumLabel;
+        document.getElementById('fAccumValue').value = kpi.accumValue;
+        document.getElementById('fEvalText').value = kpi.evalText;
+      }
+      
+      updateStatusChip(kpi.status);
+      updateMonthlyCalculatedCells(kpi);
+      renderEditPreview();
+      localStorage.setItem('betong_dashboard_local', JSON.stringify(currentState));
+    }
+
+    function saveCurrentKpi(){
+      applyEditorInputs(true);
+      const kpi = getKpiById(selectedKpiId);
+      currentState.meta.updatedLabel = 'แก้ไขชั่วคราวในหน้าเว็บ';
+      localStorage.setItem('betong_dashboard_local', JSON.stringify(currentState));
+      renderKpiList();
+      setSyncStatus(`✓ เก็บข้อมูลตัวชี้วัดที่ ${kpi.id} ไว้ในบราวเซอร์ชั่วคราวแล้ว | อย่าลืมกด "บันทึกทั้งหมดขึ้นคลาวด์" เพื่อจัดเก็บถาวร`, 'success');
+      customAlert("บันทึกชั่วคราวสำเร็จ", `ตัวชี้วัดที่ ${kpi.id} ได้รับการอัปเดตในเครื่องของคุณแล้ว กรุณากดปุ่ม "บันทึกทั้งหมดขึ้นคลาวด์" ด้านบนสุดเพื่ออัปเดตข้อมูลให้กับทุกคนในระบบ`);
+    }
+
+    async function loadFromApi(){
+      try {
+        setSyncStatus('กำลังดึงข้อมูลเรียลไทม์จาก Cloud Firestore...');
+        await signInAnonymously(auth);
+        
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'dashboardState', 'current');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data();
+          currentState = normalizeState(cloudData.state);
+          currentState.meta.updatedAt = cloudData.updatedAt || new Date().toLocaleString('th-TH');
+          localStorage.setItem('betong_dashboard_local', JSON.stringify(currentState));
+          if (!selectedKpiId) selectedKpiId = currentState.kpis[0]?.id;
+          setView(activeView);
+          setSyncStatus(`✓ โหลดข้อมูลจากระบบคลาวด์เสร็จสิ้น | บันทึกล่าสุดเมื่อ: ${currentState.meta.updatedAt}`, 'success');
+          return;
+        }
+
+        // Setup default system state if firebase is completely empty
+        setSyncStatus('ไม่พบข้อมูลบนระบบคลาวด์ กำลังเริ่มอัปโหลดโครงสร้างข้อมูลตั้งต้น...');
+        const initialLoad = normalizeState(deepClone(DEFAULT_STATE));
+        const nowStr = new Date().toLocaleString('th-TH');
+        initialLoad.meta.updatedAt = nowStr;
+        
+        await setDoc(docRef, {
+          state: initialLoad,
+          updatedAt: nowStr
+        });
+        
+        currentState = initialLoad;
+        localStorage.setItem('betong_dashboard_local', JSON.stringify(currentState));
+        if (!selectedKpiId) selectedKpiId = currentState.kpis[0]?.id;
+        setView(activeView);
+        setSyncStatus(`✓ เปิดใช้งานฐานข้อมูล Cloud สำเร็จ และอัปโหลด 11 ตัวชี้วัดเสร็จสิ้น`, 'success');
+        
+      } catch (err) {
+        console.error("Firestore Error: ", err);
+        const local = localStorage.getItem('betong_dashboard_local');
+        currentState = normalizeState(local ? JSON.parse(local) : deepClone(DEFAULT_STATE));
+        if (!selectedKpiId) selectedKpiId = currentState.kpis[0]?.id;
+        setView(activeView);
+        setSyncStatus(`⚠ ทำงานในโหมดออฟไลน์เนื่องจาก: ${err.message}`, 'error');
+      }
+    }
+
+    async function saveToApi(){
+      try {
+        if (activeView === 'edit') applyEditorInputs(true);
+        setSyncStatus('กำลังเชื่อมต่อ Cloud Firestore เพื่ออัปเดต...');
+        await signInAnonymously(auth);
+
+        const now = new Date();
+        const dateString = now.toLocaleDateString('th-TH', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+
+        currentState.meta.updatedAt = dateString;
+        currentState.meta.subtitle = `ตุลาคม 2568 – กันยายน 2569 | รายงานสะสมอัปเดตล่าสุด ณ วันที่ ${dateString.split(' เวลา')[0]}`;
+
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'dashboardState', 'current');
+        await setDoc(docRef, {
+          state: currentState,
+          updatedAt: dateString,
+          savedBy: currentState.meta.editorName || 'web-app'
+        });
+
+        localStorage.setItem('betong_dashboard_local', JSON.stringify(currentState));
+        setView(activeView);
+        setSyncStatus(`✓ บันทึกข้อมูลและกระจายข่าวสารขึ้นคลาวด์สำเร็จ! เวลาอัปเดต: ${dateString}`, 'success');
+        customAlert("สำเร็จ!", `อัปเดต 11 ตัวชี้วัดขึ้นระบบเรียบร้อยแล้ว ทุกเครื่องที่เปิดลิงก์นี้จะได้รับข้อมูลอัปเดตล่าสุดทันที`);
+      } catch (err) {
+        console.error("Firestore Upload Error: ", err);
+        setSyncStatus(`✗ บันทึกล้มเหลว: ${err.message}`, 'error');
+        customAlert("เกิดข้อผิดพลาด", `ไม่สามารถจัดเก็บข้อมูลขึ้น Cloud ได้ในขณะนี้: ${err.message}`);
+      }
+    }
+
+    document.getElementById('monthSelector').addEventListener('change', function(){
+      selectedMonthIdx = this.value !== '' ? Number(this.value) : null;
+      if (activeView === 'dashboard') renderDashboard();
+    });
+
+    document.getElementById('btnShowDashboard').addEventListener('click', () => setView('dashboard'));
+    document.getElementById('btnShowEdit').addEventListener('click', () => setView('edit'));
+    document.getElementById('btnSaveAll').addEventListener('click', saveToApi);
+    document.getElementById('btnSaveAllBottom').addEventListener('click', saveToApi);
+    document.getElementById('btnSaveOne').addEventListener('click', saveCurrentKpi);
+    document.getElementById('btnReload').addEventListener('click', loadFromApi);
+
+    const inputFields = [
+      'fTitle','fTargetLabel','fStatus','fMode','fAccumLabel','fAccumValue',
+      'fEvalText','fDetail','fColor','fUnit','fTargetValue','fCompare','fYMin',
+      'fQuarters','fTimeline','fNote','fEditorName'
+    ];
+    
+    inputFields.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) {
+        el.addEventListener('input', () => applyEditorInputs(true));
+      }
+    });
+
+    currentState = normalizeState(currentState);
+    selectedKpiId = currentState.kpis[0]?.id;
+    setView('dashboard');
+    loadFromApi();
+  </script>
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAz07C8pHkCGbRswlThu3NIwVoZmEkeELQ",
+  authDomain: "dashboardkpi-cg2026.firebaseapp.com",
+  databaseURL: "https://dashboardkpi-cg2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "dashboardkpi-cg2026",
+  storageBucket: "dashboardkpi-cg2026.firebasestorage.app",
+  messagingSenderId: "616161372378",
+  appId: "1:616161372378:web:fa6bb160312acbb5889de3",
+  measurementId: "G-P94QEREWQ2"
+};
+</body>
+</html>
